@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Adiciona rolagem suave para todos os links de âncora */
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  :root {
+    --background: 45 33% 94%; /* #f7f1e1 */
+    --foreground: 330 38% 56%; /* #855e6e */
+
+    --card: 45 33% 94%; /* #f7f1e1 */
+    --card-foreground: 330 38% 56%; /* #855e6e */
+
+    --popover: 45 33% 94%; /* #f7f1e1 */
+    --popover-foreground: 330 38% 56%; /* #855e6e */
+
+    --primary: 338 66% 63%; /* #ce7095 */
+    --primary-foreground: 345 100% 92%; /* #ffdbd7 */
+
+    --secondary: 345 100% 92%; /* #ffdbd7 */
+    --secondary-foreground: 330 38% 56%; /* #855e6e */
+
+    --muted: 345 100% 92%; /* #ffdbd7 */
+    --muted-foreground: 330 38% 56%; /* #855e6e */
+
+    --accent: 338 100% 80%; /* #ffb2c1 */
+    --accent-foreground: 330 38% 56%; /* #855e6e */
+
+    --destructive: 338 100% 80%; /* #ffb2c1 */
+    --destructive-foreground: 330 38% 56%; /* #855e6e */
+
+    --border: 330 38% 56%; /* #855e6e */
+    --input: 330 38% 56%; /* #855e6e */
+    --ring: 338 66% 63%; /* #ce7095 */
+
+    --radius: 1rem;
+
+    /* Custom bakery colors */
+    --bakery-pink: 338 66% 63%; /* #ce7095 - rosa principal */
+    --bakery-dark-purple: 330 38% 30%; /* roxo escuro */
+  }
+
+  .dark {
+    --background: 330 38% 20%; /* Darker version of #855e6e */
+    --foreground: 345 100% 92%; /* #ffdbd7 */
+
+    --card: 330 38% 20%; 
+    --card-foreground: 345 100% 92%;
+
+    --popover: 330 38% 20%; 
+    --popover-foreground: 345 100% 92%;
+
+    --primary: 338 66% 63%; /* #ce7095 */
+    --primary-foreground: 330 38% 20%;
+
+    --secondary: 330 38% 30%; 
+    --secondary-foreground: 345 100% 92%;
+
+    --muted: 330 38% 30%; 
+    --muted-foreground: 345 100% 92%;
+
+    --accent: 338 100% 80%; /* #ffb2c1 */
+    --accent-foreground: 345 100% 92%;
+
+    --destructive: 338 100% 80%; 
+    --destructive-foreground: 345 100% 92%;
+
+    --border: 330 38% 30%;
+    --input: 330 38% 30%;
+    --ring: 338 66% 63%;
+
+    /* Custom bakery colors for dark mode */
+    --bakery-pink: 338 66% 68%; /* slightly lighter pink for dark mode */
+    --bakery-dark-purple: 330 38% 25%; /* darker purple for dark mode */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-quicksand;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-quicksand font-bold;
+  }
+  
+  /* Font display utility */
+  .font-display {
+    @apply font-quicksand;
+  }
+  
+  /* Custom scroll styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary rounded-full;
+  }
+}
+
+/* Utility classes */
+@layer components {
+  .hero-gradient {
+    @apply bg-gradient-to-r from-secondary via-background to-secondary;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Bakery color utilities */
+  .text-bakery-pink {
+    color: hsl(var(--bakery-pink));
+  }
+
+  .bg-bakery-pink {
+    background-color: hsl(var(--bakery-pink));
+  }
+
+  .text-bakery-dark-purple {
+    color: hsl(var(--bakery-dark-purple));
+  }
+
+  .bg-bakery-dark-purple {
+    background-color: hsl(var(--bakery-dark-purple));
+  }
+
+  .border-bakery-pink {
+    border-color: hsl(var(--bakery-pink));
+  }
+
+  /* Hover variants */
+  .hover\:bg-bakery-pink\/90:hover {
+    background-color: hsl(var(--bakery-pink) / 0.9);
+  }
+
+  .hover\:border-bakery-pink\/40:hover {
+    border-color: hsl(var(--bakery-pink) / 0.4);
+  }
+
+  .bg-bakery-pink\/20 {
+    background-color: hsl(var(--bakery-pink) / 0.2);
+  }
+
+  .bg-bakery-pink\/30 {
+    background-color: hsl(var(--bakery-pink) / 0.3);
+  }
+
+  .border-bakery-pink\/20 {
+    border-color: hsl(var(--bakery-pink) / 0.2);
+  }
+}
+
