@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as ReactHotToastToaster } from 'react-hot-toast';
+
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
@@ -26,8 +27,34 @@ const App = () => (
     <Router>
       <TooltipProvider>
         <StoreProvider>
-          <Toaster />
-          <Sonner />
+          <ReactHotToastToaster
+            position="bottom-left"
+            toastOptions={{
+              duration: 2500,
+              style: {
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                border: '1px solid hsl(var(--border))',
+                padding: '16px',
+                fontSize: '15px',
+                lineHeight: '1.5',
+                maxWidth: '400px',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: 'hsl(var(--primary))',
+                  secondary: 'hsl(var(--primary-foreground))',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: 'hsl(var(--destructive))',
+                  secondary: 'hsl(var(--primary-foreground))',
+                },
+              },
+            }}
+          />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/admin" element={<Admin />} />

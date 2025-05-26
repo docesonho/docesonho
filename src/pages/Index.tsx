@@ -58,7 +58,7 @@ const Index = () => {
       <Navigation />
       
       {/* New Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 md:py-16 overflow-hidden">
+      <section className="bg-white py-8 md:py-16 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[500px] md:min-h-[600px]">
             
@@ -115,9 +115,6 @@ const Index = () => {
                               loading={index === 0 ? "eager" : "lazy"}
                             />
                           </div>
-                          {/* Decorative elements */}
-                          <div className="absolute -top-4 -right-4 w-16 h-16 bg-bakery-pink/20 rounded-full blur-xl"></div>
-                          <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-purple-300/30 rounded-full blur-xl"></div>
                         </div>
                       </CarouselItem>
                     ))}

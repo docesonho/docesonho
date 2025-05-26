@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, Category, CartItem, HeroConfig } from '../types';
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 
 // Sample data
 const sampleCategories: Category[] = [
@@ -175,8 +175,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const removeFromCart = (productId: string) => {
     setCartItems(prev => {
+      const itemToRemove = prev.find(item => item.product.id === productId);
       const updatedItems = prev.filter(item => item.product.id !== productId);
-      toast.info("Item removido do carrinho");
+      if (itemToRemove) {
+        toast(`${itemToRemove.product.name} removido do carrinho`);
+      } else {
+        toast("Item removido do carrinho"); // Fallback se o item não for encontrado (improvável)
+      }
       return updatedItems;
     });
   };
@@ -195,7 +200,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const clearCart = () => {
     setCartItems([]);
-    toast.info("Carrinho esvaziado");
+    toast("Carrinho esvaziado");
   };
 
   const getCartTotal = () => {
