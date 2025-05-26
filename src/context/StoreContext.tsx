@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, Category, CartItem, HeroConfig } from '../types';
 import toast from 'react-hot-toast';
+import { useHero } from '@/hooks/useHero';
 
 // Sample data
 const sampleCategories: Category[] = [
@@ -95,6 +96,7 @@ interface StoreContextType {
   categories: Category[];
   cartItems: CartItem[];
   heroConfig: HeroConfig;
+  isLoadingHero?: boolean;
   addToCart: (product: Product, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   updateCartItemQuantity: (productId: string, quantity: number) => void;
@@ -114,6 +116,8 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { heroConfig, isLoading: isLoadingHero, updateHeroConfig: mutateHeroConfigHook } = useHero();
+  
   // Initialize with sample data
   const [products, setProducts] = useState<Product[]>(() => {
     const savedProducts = localStorage.getItem('products');
@@ -130,11 +134,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return savedCartItems ? JSON.parse(savedCartItems) : [];
   });
 
-  const [heroConfig, setHeroConfig] = useState<HeroConfig>(() => {
-    const savedHeroConfig = localStorage.getItem('heroConfig');
-    return savedHeroConfig ? JSON.parse(savedHeroConfig) : defaultHeroConfig;
-  });
-
   // Save to localStorage when products change
   useEffect(() => {
     localStorage.setItem('products', JSON.stringify(products));
@@ -144,11 +143,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
-
-  // Save to localStorage when hero config changes
-  useEffect(() => {
-    localStorage.setItem('heroConfig', JSON.stringify(heroConfig));
-  }, [heroConfig]);
 
   // Save to localStorage when categories change
   useEffect(() => {
@@ -245,11 +239,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return products.filter(product => product.featured);
   };
 
-  const updateHeroConfig = (config: HeroConfig) => {
-    setHeroConfig(config);
-    toast.success('Configuração do Hero atualizada com sucesso!');
-  };
-
   const addCategory = (category: Omit<Category, "id">) => {
     const slug = category.name
       .toLowerCase()
@@ -296,6 +285,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     categories,
     cartItems,
     heroConfig,
+    isLoadingHero,
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
@@ -306,7 +296,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     deleteProduct,
     getProductsByCategory,
     getFeaturedProducts,
-    updateHeroConfig,
+    updateHeroConfig: (config: HeroConfig) => {
+      console.log('[StoreContext] Chamando mutateHeroConfigHook com:', config);
+      mutateHeroConfigHook.mutate(config);
+    },
     addCategory,
     updateCategory,
     deleteCategory

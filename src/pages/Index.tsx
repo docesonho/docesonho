@@ -10,7 +10,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from 'embla-carousel-autoplay';
 
 const Index = () => {
-  const { products, categories, getFeaturedProducts, heroConfig } = useStore();
+  const { products, categories, getFeaturedProducts, heroConfig, isLoadingHero } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -35,10 +35,10 @@ const Index = () => {
   };
 
   const heroImages = [
-    heroConfig.image1,
-    heroConfig.image2,
-    heroConfig.image3,
-  ];
+    heroConfig?.image1,
+    heroConfig?.image2,
+    heroConfig?.image3,
+  ].filter(Boolean) as string[];
 
   useEffect(() => {
     if (!api) {
@@ -61,84 +61,90 @@ const Index = () => {
       <section className="bg-white py-8 md:py-16 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[500px] md:min-h-[600px]">
-            
-            {/* Text Content */}
-            <div className="order-2 lg:order-1 text-center lg:text-left space-y-6">
-              <div className="space-y-4">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
-                  {heroConfig.title.split(' ').map((word, i, arr) => 
-                    i === arr.length - 1 ? 
-                    <span key={i} className="text-bakery-pink block">{word}</span> : 
-                    <span key={i} className="text-gray-800">{word} </span>
-                  )}
-                </h1>
-                <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  {heroConfig.subtitle}
-                </p>
+            {isLoadingHero ? (
+              <div className="col-span-2 flex justify-center items-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-bakery-pink"></div>
               </div>
-              
-              <div className="pt-4">
-                <a 
-                  href="#catalogo"
-                  className="inline-flex items-center justify-center bg-bakery-pink hover:bg-bakery-pink/90 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
-                >
-                  {heroConfig.buttonText}
-                </a>
-              </div>
-            </div>
-
-            {/* Image Carousel */}
-            <div className="order-1 lg:order-2 relative">
-              <div className="relative w-full max-w-md mx-auto lg:max-w-none">
-                <Carousel
-                  setApi={setApi}
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  plugins={[
-                    Autoplay({
-                      delay: 4000,
-                    }),
-                  ]}
-                  className="w-full"
-                >
-                  <CarouselContent>
-                    {heroImages.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <div className="relative">
-                          <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                            <img
-                              src={image}
-                              alt={`Promoção ${index + 1}`}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                              loading={index === 0 ? "eager" : "lazy"}
-                            />
-                          </div>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex -left-12 bg-white/80 hover:bg-white border-2 border-bakery-pink/20 hover:border-bakery-pink/40 text-bakery-pink" />
-                  <CarouselNext className="hidden md:flex -right-12 bg-white/80 hover:bg-white border-2 border-bakery-pink/20 hover:border-bakery-pink/40 text-bakery-pink" />
-                </Carousel>
-                
-                {/* Carousel indicators */}
-                <div className="flex justify-center mt-4 gap-2">
-                  {heroImages.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        current === index + 1 ? "bg-bakery-pink w-6" : "bg-bakery-pink/30"
-                      }`}
-                      onClick={() => api?.scrollTo(index)}
-                      aria-label={`Ir para slide ${index + 1}`}
-                    />
-                  ))}
+            ) : (
+              <>
+                {/* Text Content */}
+                <div className="order-2 lg:order-1 text-center lg:text-left space-y-6">
+                  <div className="space-y-4">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
+                      {(heroConfig?.title || "").split(' ').map((word, i, arr) => 
+                        i === arr.length - 1 ? 
+                        <span key={i} className="text-bakery-pink block">{word}</span> : 
+                        <span key={i} className="text-gray-800">{word} </span>
+                      )}
+                    </h1>
+                    <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                      {heroConfig?.subtitle || ""}
+                    </p>
+                  </div>
+                  
+                  <div className="pt-4">
+                    <a 
+                      href="#catalogo"
+                      className="inline-flex items-center justify-center bg-bakery-pink hover:bg-bakery-pink/90 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
+                    >
+                      {heroConfig?.buttonText}
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </div>
-            
+
+                {/* Image Carousel */}
+                <div className="order-1 lg:order-2 relative">
+                  <div className="relative w-full max-w-md mx-auto lg:max-w-none">
+                    <Carousel
+                      setApi={setApi}
+                      opts={{
+                        align: "start",
+                        loop: true,
+                      }}
+                      plugins={[
+                        Autoplay({
+                          delay: 4000,
+                        }),
+                      ]}
+                      className="w-full"
+                    >
+                      <CarouselContent>
+                        {heroImages.map((image, index) => (
+                          <CarouselItem key={index}>
+                            <div className="relative">
+                              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
+                                <img
+                                  src={image}
+                                  alt={`Promoção ${index + 1}`}
+                                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                  loading={index === 0 ? "eager" : "lazy"}
+                                />
+                              </div>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="hidden md:flex -left-12 bg-white/80 hover:bg-white border-2 border-bakery-pink/20 hover:border-bakery-pink/40 text-bakery-pink" />
+                      <CarouselNext className="hidden md:flex -right-12 bg-white/80 hover:bg-white border-2 border-bakery-pink/20 hover:border-bakery-pink/40 text-bakery-pink" />
+                    </Carousel>
+                    
+                    {/* Carousel indicators */}
+                    <div className="flex justify-center mt-4 gap-2">
+                      {heroImages.map((_, index) => (
+                        <button
+                          key={index}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            current === index + 1 ? "bg-bakery-pink w-6" : "bg-bakery-pink/30"
+                          }`}
+                          onClick={() => api?.scrollTo(index)}
+                          aria-label={`Ir para slide ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

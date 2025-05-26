@@ -21,8 +21,8 @@ const HeroManager: React.FC<HeroManagerProps> = ({ heroConfig, updateHeroConfig 
 
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[HeroManager] Salvando:', currentHeroConfig);
     updateHeroConfig(currentHeroConfig);
-    toast.success('Configuração do Hero atualizada com sucesso!');
   };
 
   const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, imageKey: keyof Pick<HeroConfig, 'image1' | 'image2' | 'image3'>) => {
@@ -33,7 +33,7 @@ const HeroManager: React.FC<HeroManagerProps> = ({ heroConfig, updateHeroConfig 
       // Tamanho otimizado para o hero: 600x600px
       const resizedImageData = await resizeImage(file, 600, 600);
       setCurrentHeroConfig({ ...currentHeroConfig, [imageKey]: resizedImageData });
-      toast.success('Imagem carregada com sucesso!');
+      toast.success('Imagem carregada e pronta para salvar!');
     } catch (error) {
       console.error('Error processing image:', error);
       toast.error('Erro ao processar imagem!');
