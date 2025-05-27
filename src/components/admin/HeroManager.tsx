@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import { resizeImage } from '@/lib/utils';
 
 interface HeroManagerProps {
@@ -19,10 +19,15 @@ const HeroManager: React.FC<HeroManagerProps> = ({ heroConfig, updateHeroConfig 
     setCurrentHeroConfig(heroConfig);
   }, [heroConfig]);
 
-  const handleHeroSubmit = (e: React.FormEvent) => {
+  const handleHeroSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('[HeroManager] Salvando:', currentHeroConfig);
-    updateHeroConfig(currentHeroConfig);
+    try {
+      await updateHeroConfig(currentHeroConfig);
+      toast.success('Configuração do Hero atualizada com sucesso!');
+    } catch (error) {
+      console.error('[HeroManager] Erro ao salvar:', error);
+      toast.error('Erro ao salvar alterações. Por favor, tente novamente.');
+    }
   };
 
   const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, imageKey: keyof Pick<HeroConfig, 'image1' | 'image2' | 'image3'>) => {
@@ -31,7 +36,7 @@ const HeroManager: React.FC<HeroManagerProps> = ({ heroConfig, updateHeroConfig 
 
     try {
       // Tamanho otimizado para o hero: 600x600px
-      const resizedImageData = await resizeImage(file, 600, 600);
+      const resizedImageData = await resizeImage(file);
       setCurrentHeroConfig({ ...currentHeroConfig, [imageKey]: resizedImageData });
       toast.success('Imagem carregada e pronta para salvar!');
     } catch (error) {

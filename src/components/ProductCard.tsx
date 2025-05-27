@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
   
   const handleWhatsAppOrder = () => {
-    const phoneNumber = '5527998329362'; // Numero do whatsapp da Doce Sonho
+    const phoneNumber = '5527996487579'; // Numero do whatsapp da Doce Sonho
     const message = `Olá! Gostaria de pedir *${product.name}* por ${formatCurrency(product.price)}.`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -29,9 +29,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <Card className="overflow-hidden card-hover">
       <div className="h-48 overflow-hidden">
         <img 
-          src={product.image} 
+          src={product.image_url} 
           alt={product.name} 
           className="w-full h-full object-cover transition-transform hover:scale-105"
+          loading="lazy"
         />
       </div>
       <CardContent className="pt-4">

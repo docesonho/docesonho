@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold text-lg mb-4">Contato</h3>
             <div className="flex flex-col space-y-3 text-gray-600">
               <p>(27) 99648-7579</p>
-              <p>contato@exemplo.com.br</p>
+              <p>docesonhosite@outlook.com.br</p>
               <p>Ibiraçu - ES</p>
               <a 
                 href="https://www.instagram.com/_docesonho.confeitaria._/" 

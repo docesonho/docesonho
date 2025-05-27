@@ -1,18 +1,22 @@
-
 export interface Product {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
-  image: string;
-  categoryId: string;
-  featured?: boolean;
+  image_url: string;
+  category_id: string;
+  featured: boolean;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Category {
   id: string;
   name: string;
   slug: string;
+  active: boolean;
+  order_index: number;
 }
 
 export interface CartItem {

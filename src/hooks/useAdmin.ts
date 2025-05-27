@@ -170,7 +170,6 @@ export function useAdmin() {
         return false;
       }
       const isValid = code === recoveryCode;
-      console.log('Verificando código:', { fornecido: code, armazenado: recoveryCode, isValid });
       return isValid;
     } catch (error) {
       console.error('Erro ao verificar código:', error);
@@ -180,22 +179,16 @@ export function useAdmin() {
 
   const resetPassword = async (code: string, newPassword: string) => {
     try {
-      console.log('Iniciando reset de senha...');
-      
       if (!code || !newPassword) {
         throw new Error('Código de recuperação e nova senha são obrigatórios');
       }
 
       const isValid = await verifyRecoveryCode(code);
       if (!isValid) {
-        console.error('Código de recuperação inválido:', { fornecido: code, esperado: recoveryCode });
         throw new Error('Código de recuperação inválido');
       }
 
-      console.log('Código válido, atualizando senha...');
       await updatePassword.mutateAsync(newPassword);
-      
-      console.log('Senha atualizada com sucesso');
       return true;
     } catch (error) {
       console.error('Erro ao resetar senha:', error);
@@ -208,15 +201,13 @@ export function useAdmin() {
   };
 
   return {
-    adminPassword,
-    recoveryCode,
+    isAuthenticated,
     isLoading,
-    updatePassword,
-    updateRecoveryCode,
     verifyPassword,
     verifyRecoveryCode,
+    updatePassword,
+    updateRecoveryCode,
     resetPassword,
-    isAuthenticated,
     logout,
   };
 } 

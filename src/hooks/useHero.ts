@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import { HeroConfig } from '@/types';
 
 const defaultHeroConfig: HeroConfig = {
@@ -35,16 +35,8 @@ export function useHero() {
 
   const updateHeroConfig = useMutation({
     mutationFn: async (newConfig: HeroConfig) => {
-      console.log('[useHero] mutationFn: Tentando salvar newConfig:', newConfig);
-
       if (typeof newConfig !== 'object' || newConfig === null) {
-        console.error('[useHero] mutationFn: newConfig não é um objeto válido. Abortando.');
-        toast.error('Erro interno: Formato de dados inválido para salvar.');
         throw new Error('Formato de dados inválido para salvar.');
-      }
-
-      if (Object.keys(newConfig).every(k => !isNaN(parseInt(k))) && Object.keys(newConfig).length > 10) {
-         console.warn('[useHero] mutationFn: newConfig é um OBJETO, mas parece já estar no formato {"0": "...", "1": "..."}. Isso é inesperado aqui.');
       }
 
       const { data, error } = await supabase
@@ -56,16 +48,13 @@ export function useHero() {
         .select();
 
       if (error) {
-        console.error('[useHero] Erro no upsert do heroConfig:', error);
-        toast.error(`Erro ao salvar: ${error.message}`);
         throw error;
       }
-      console.log('[useHero] heroConfig upsert bem-sucedido:', data);
+      
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['heroConfig'] });
-      toast.success('Configuração do Hero atualizada com sucesso!');
     },
     onError: (error: Error) => {
       console.error('[useHero] onError da mutação heroConfig:', error);

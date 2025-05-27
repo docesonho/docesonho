@@ -7,10 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
 
 const Index = () => {
-  const { products, categories, getFeaturedProducts, heroConfig, isLoadingHero } = useStore();
+  const { products = [], categories = [], getFeaturedProducts, heroConfig, isLoadingHero } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -19,7 +18,7 @@ const Index = () => {
   
   const filteredProducts = (categoryId?: string) => {
     let filtered = categoryId
-      ? products.filter((product) => product.categoryId === categoryId)
+      ? products.filter((product) => product.category_id === categoryId)
       : products;
       
     if (searchTerm.trim() !== "") {
@@ -27,7 +26,7 @@ const Index = () => {
       filtered = filtered.filter(
         (product) =>
           product.name.toLowerCase().includes(term) ||
-          product.description.toLowerCase().includes(term)
+          (product.description?.toLowerCase() || '').includes(term)
       );
     }
     
@@ -101,11 +100,6 @@ const Index = () => {
                         align: "start",
                         loop: true,
                       }}
-                      plugins={[
-                        Autoplay({
-                          delay: 4000,
-                        }),
-                      ]}
                       className="w-full"
                     >
                       <CarouselContent>

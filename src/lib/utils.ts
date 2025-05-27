@@ -1,6 +1,6 @@
-
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { uploadProductImage as uploadImage } from "./supabase"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -32,7 +32,7 @@ export function dataURLtoFile(dataurl: string, filename: string): File {
   return new File([u8arr], filename, { type: mime });
 }
 
-export function resizeImage(file: File, maxWidth = 800, maxHeight = 800): Promise<string> {
+export async function resizeImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -40,32 +40,49 @@ export function resizeImage(file: File, maxWidth = 800, maxHeight = 800): Promis
       const img = new Image();
       img.src = event.target?.result as string;
       img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
-        
+
         if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round(height * maxWidth / width);
-            width = maxWidth;
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
           }
         } else {
-          if (height > maxHeight) {
-            width = Math.round(width * maxHeight / height);
-            height = maxHeight;
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
           }
         }
-        
-        const canvas = document.createElement('canvas');
+
         canvas.width = width;
         canvas.height = height;
-        
+
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        
-        resolve(canvas.toDataURL(file.type || 'image/jpeg', 0.85));
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(dataUrl);
       };
-      img.onerror = (error) => reject(error);
+      img.onerror = reject;
     };
-    reader.onerror = (error) => reject(error);
+    reader.onerror = reject;
   });
+}
+
+export const uploadProductImage = uploadImage;
+
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/--+/g, '-')
+    .trim();
 }

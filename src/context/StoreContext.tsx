@@ -2,84 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, Category, CartItem, HeroConfig } from '../types';
 import toast from 'react-hot-toast';
 import { useHero } from '@/hooks/useHero';
-
-// Sample data
-const sampleCategories: Category[] = [
-  { id: "1", name: "Bolos", slug: "bolos" },
-  { id: "2", name: "Doces", slug: "doces" },
-  { id: "3", name: "Tortas", slug: "tortas" },
-  { id: "4", name: "Salgados", slug: "salgados" },
-];
-
-const sampleProducts: Product[] = [
-  {
-    id: "1",
-    name: "Bolo de Chocolate",
-    description: "Delicioso bolo de chocolate com cobertura de ganache",
-    price: 45.9,
-    image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "1",
-    featured: true,
-  },
-  {
-    id: "2",
-    name: "Bolo de Morango",
-    description: "Bolo com massa branca, recheio e cobertura de morangos frescos",
-    price: 48.9,
-    image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "1",
-  },
-  {
-    id: "3",
-    name: "Brigadeiro Gourmet",
-    description: "Brigadeiros artesanais com chocolate belga",
-    price: 3.5,
-    image: "https://images.unsplash.com/photo-1597655601841-214a4cfe8b2c?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "2",
-    featured: true,
-  },
-  {
-    id: "4",
-    name: "Torta de Limão",
-    description: "Torta de limão com base crocante e cobertura de merengue",
-    price: 38.9,
-    image: "https://images.unsplash.com/photo-1519915028121-7d3463d5b1ff?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "3",
-  },
-  {
-    id: "5",
-    name: "Coxinha",
-    description: "Coxinha cremosa de frango com catupiry",
-    price: 4.9,
-    image: "https://images.unsplash.com/photo-1628824851008-ad858fa70dd2?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "4",
-  },
-  {
-    id: "6",
-    name: "Bolo Red Velvet",
-    description: "Bolo vermelho com recheio de cream cheese",
-    price: 55.9,
-    image: "https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "1",
-  },
-  {
-    id: "7",
-    name: "Beijinho",
-    description: "Docinhos de coco com cravos",
-    price: 2.9,
-    image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "2",
-  },
-  {
-    id: "8",
-    name: "Torta de Maçã",
-    description: "Torta de maçã com canela e açúcar",
-    price: 36.9,
-    image: "https://images.unsplash.com/photo-1562007908-17c67e878c88?q=80&w=800&h=800&auto=format&fit=crop",
-    categoryId: "3",
-    featured: true,
-  },
-];
+import { useProducts } from '@/hooks/useProducts';
 
 // Default hero configuration
 const defaultHeroConfig: HeroConfig = {
@@ -97,6 +20,7 @@ interface StoreContextType {
   cartItems: CartItem[];
   heroConfig: HeroConfig;
   isLoadingHero?: boolean;
+  isLoadingProducts?: boolean;
   addToCart: (product: Product, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   updateCartItemQuantity: (productId: string, quantity: number) => void;
@@ -116,38 +40,30 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { heroConfig, isLoading: isLoadingHero, updateHeroConfig: mutateHeroConfigHook } = useHero();
-  
-  // Initialize with sample data
-  const [products, setProducts] = useState<Product[]>(() => {
-    const savedProducts = localStorage.getItem('products');
-    return savedProducts ? JSON.parse(savedProducts) : sampleProducts;
-  });
-  
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const savedCategories = localStorage.getItem('categories');
-    return savedCategories ? JSON.parse(savedCategories) : sampleCategories;
-  });
+  const { heroConfig: heroConfigData, isLoading: isLoadingHero, updateHeroConfig: mutateHeroConfigHook } = useHero();
+  const { 
+    products = [], 
+    categories = [], 
+    isLoading: isLoadingProducts,
+    createProduct,
+    updateProduct: mutateProduct,
+    deleteProduct: mutateDeleteProduct,
+    createCategory,
+    updateCategory: mutateCategory,
+    deleteCategory: mutateDeleteCategory
+  } = useProducts();
   
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const savedCartItems = localStorage.getItem('cartItems');
     return savedCartItems ? JSON.parse(savedCartItems) : [];
   });
 
-  // Save to localStorage when products change
-  useEffect(() => {
-    localStorage.setItem('products', JSON.stringify(products));
-  }, [products]);
-
-  // Save to localStorage when cart items change
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Save to localStorage when categories change
-  useEffect(() => {
-    localStorage.setItem('categories', JSON.stringify(categories));
-  }, [categories]);
+  // Garantir que temos um heroConfig mesmo durante o carregamento
+  const heroConfig = heroConfigData || defaultHeroConfig;
 
   const addToCart = (product: Product, quantity: number) => {
     setCartItems(prev => {
@@ -201,34 +117,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return cartItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
   };
 
-  // Admin functions
-  const addProduct = (product: Product) => {
-    setProducts(prev => {
-      const newProduct = { ...product, id: Date.now().toString() };
-      toast.success(`Produto "${product.name}" adicionado com sucesso!`);
-      return [...prev, newProduct];
-    });
+  const addProduct = (product: Omit<Product, "id">) => {
+    createProduct.mutate(product);
   };
 
   const updateProduct = (product: Product) => {
-    setProducts(prev => {
-      const updatedProducts = prev.map(p => 
-        p.id === product.id ? product : p
-      );
-      toast.success(`Produto "${product.name}" atualizado com sucesso!`);
-      return updatedProducts;
-    });
+    mutateProduct.mutate(product);
   };
 
   const deleteProduct = (productId: string) => {
-    setProducts(prev => {
-      const productToDelete = prev.find(p => p.id === productId);
-      const updatedProducts = prev.filter(p => p.id !== productId);
-      if (productToDelete) {
-        toast.success(`Produto "${productToDelete.name}" removido com sucesso!`);
-      }
-      return updatedProducts;
-    });
+    mutateDeleteProduct.mutate(productId);
   };
 
   const getProductsByCategory = (categoryId: string) => {
@@ -240,44 +138,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addCategory = (category: Omit<Category, "id">) => {
-    const slug = category.name
-      .toLowerCase()
-      .replace(/[^\w\s]/gi, '')
-      .replace(/\s+/g, '-');
-      
-    setCategories(prev => {
-      const newCategory = { ...category, slug, id: Date.now().toString() };
-      toast.success(`Categoria "${category.name}" adicionada com sucesso!`);
-      return [...prev, newCategory];
-    });
+    createCategory.mutate(category);
   };
 
   const updateCategory = (category: Category) => {
-    setCategories(prev => {
-      const updatedCategories = prev.map(c => 
-        c.id === category.id ? category : c
-      );
-      toast.success(`Categoria "${category.name}" atualizada com sucesso!`);
-      return updatedCategories;
-    });
+    mutateCategory.mutate(category);
   };
 
   const deleteCategory = (categoryId: string) => {
-    // Check if there are products using this category
     const productsInCategory = products.filter(p => p.categoryId === categoryId);
     if (productsInCategory.length > 0) {
       toast.error("Não é possível excluir uma categoria que possui produtos associados.");
       return;
     }
-    
-    setCategories(prev => {
-      const categoryToDelete = prev.find(c => c.id === categoryId);
-      const updatedCategories = prev.filter(c => c.id !== categoryId);
-      if (categoryToDelete) {
-        toast.success(`Categoria "${categoryToDelete.name}" removida com sucesso!`);
-      }
-      return updatedCategories;
-    });
+    mutateDeleteCategory.mutate(categoryId);
   };
 
   const value = {
@@ -286,6 +160,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     cartItems,
     heroConfig,
     isLoadingHero,
+    isLoadingProducts,
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
@@ -297,13 +172,23 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getProductsByCategory,
     getFeaturedProducts,
     updateHeroConfig: (config: HeroConfig) => {
-      console.log('[StoreContext] Chamando mutateHeroConfigHook com:', config);
       mutateHeroConfigHook.mutate(config);
     },
     addCategory,
     updateCategory,
     deleteCategory
   };
+
+  // Só renderiza o conteúdo quando os dados essenciais estiverem carregados
+  if (isLoadingHero || isLoadingProducts) {
+    return (
+      <StoreContext.Provider value={value}>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-bakery-pink"></div>
+        </div>
+      </StoreContext.Provider>
+    );
+  }
 
   return (
     <StoreContext.Provider value={value}>

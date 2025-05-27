@@ -10,10 +10,9 @@ const CartContent: React.FC = () => {
   const handleWhatsAppCheckout = () => {
     if (cartItems.length === 0) return;
     
-    const phoneNumber = '5527998329362'; // Numero do whatsapp da Doce Sonho
-    const message = `*Novo Pedido*\n\n${cartItems.map(item => 
-      `*${item.quantity}x ${item.product.name}*\nR$ ${(item.product.price * item.quantity).toFixed(2)}`
-    ).join('\n\n')}\n\n*Total:* R$ ${getCartTotal().toFixed(2)}`;
+    const itemsList = cartItems.map(item => `*${item.quantity}x* ${item.product.name}`).join('\n');
+    const phoneNumber = '5527996487579'; // Numero do whatsapp da Doce Sonho
+    const message = `*Novo Pedido*\n\n${itemsList}\n\n*Total:* R$ ${getCartTotal().toFixed(2)}`;
     
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -37,7 +36,7 @@ const CartContent: React.FC = () => {
         {cartItems.map((item) => (
           <div key={item.product.id} className="flex items-center gap-4 py-4 border-b">
             <img 
-              src={item.product.image} 
+              src={item.product.image_url} 
               alt={item.product.name} 
               className="w-16 h-16 object-cover rounded-md"
             />
